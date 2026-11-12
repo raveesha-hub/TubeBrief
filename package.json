@@ -1,0 +1,15 @@
+{
+  "name": "yt-summarizer",
+  "version": "1.0.0",
+  "description": "YouTube AI Summarizer (Gemini + Firebase)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "youtube-transcript": "^1.3.1"
+  }
+}

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TubeBrief – YouTube AI Summarizer</title>
+  <link rel="stylesheet" href="style.css">
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')}catch(e){}</script>
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <header class="nav">
+    <a class="logo" href="#" id="logo"><span class="play">▶</span> TubeBrief</a>
+    <nav>
+      <button class="link on" data-view="home">Home</button>
+      <button class="link" data-view="history">My History</button>
+    </nav>
+    <div class="nav-right">
+      <button id="themeBtn" class="icon-btn" title="Dark / Light mode" aria-label="Toggle theme">☀️</button>
+      <span id="userName" class="muted"></span>
+      <button id="authBtn" class="btn small">Login</button>
+    </div>
+  </header>
+
+  <!-- ================= HOME: slide by slide ================= -->
+  <main id="slides" class="slides">
+
+    <!-- Slide 1 : Hero -->
+    <section class="slide hero" id="s-hero">
+      <div class="hero-text">
+        <span class="badge">✨ AI YouTube Summarizer</span>
+        <h1>Watch less.<br><span class="shine">Understand more.</span></h1>
+        <p class="muted">Paste a YouTube link to get an AI-generated point-by-point summary. Then, ask as many questions as you want about the video in any language.</p>
+        <div class="hero-cta">
+          <button class="btn big-btn" data-goto="s-url">Get started ↓</button>
+          <button class="btn ghost big-btn" data-view="history">My History</button>
+        </div>
+        <ul class="chips">
+          <li>📝 Summary</li><li>🔑 Key points</li><li>❓ Unlimited questions</li><li>🌐 Sinhala / English</li>
+        </ul>
+      </div>
+      <div class="hero-art">
+        <img class="hero-dark" src="img/hero-dark.jpg" alt="AI robot summarizing YouTube videos">
+        <img class="hero-light" src="img/hero-light.jpg" alt="AI robot summarizing YouTube videos">
+      </div>
+    </section>
+
+    <!-- Slide 2 : URL -->
+    <section class="slide center" id="s-url">
+      <div class="panel">
+        <h2><span class="step">1</span> Paste your YouTube link</h2>
+        <label for="url">YouTube Video URL</label>
+        <input id="url" type="url" placeholder="https://www.youtube.com/watch?v=...">
+
+        <label for="lang">Answer language</label>
+        <select id="lang">
+          <option value="Sinhala">සිංහල</option>
+          <option value="English">English</option>
+          <option value="Tamil">தமிழ்</option>
+          <option value="Hindi">हिन्दी</option>
+          <option value="auto">Auto (question's language)</option>
+        </select>
+
+        <details>
+          <summary>Paste the transcript (only if the AI cannot access the video).</summary>
+          <textarea id="transcript" rows="4" placeholder="Optional: paste the transcript here"></textarea>
+        </details>
+
+        <button id="go" class="btn big">Generate Summary ✨</button>
+        <p id="error" class="error" hidden></p>
+        <div id="loader" class="loader" hidden><div class="spin"></div><p>Analyzing the video… (10–60 seconds)</p></div>
+      </div>
+    </section>
+
+    <!-- Slide 3 : Summary (shown after generate) -->
+    <section class="slide center" id="s-summary" hidden>
+      <div class="panel wide">
+        <h2><span class="step">2</span> Summary</h2>
+        <div class="thumb-row">
+          <img id="thumb" alt="Video thumbnail">
+          <div class="vt">
+            <b id="vtitle"></b>
+            <div class="actions">
+              <button id="copyBtn" class="btn small ghost">Copy</button>
+              <button id="dlBtn" class="btn small ghost">Download .md</button>
+            </div>
+          </div>
+        </div>
+        <div id="out" class="md"></div>
+        <button class="btn ghost small" data-goto="s-ask">Ask a question ↓</button>
+      </div>
+    </section>
+
+    <!-- Slide 4 : Q&A (shown after generate) -->
+    <section class="slide center" id="s-ask" hidden>
+      <div class="panel wide">
+        <h2><span class="step">3</span> Ask anything about this video</h2>
+        <div class="ask-lang">
+          <label for="lang2">Answer language</label>
+          <select id="lang2">
+            <option value="Sinhala">සිංහල</option>
+            <option value="English">English</option>
+            <option value="Tamil">தமிழ்</option>
+            <option value="Hindi">हिन्दी</option>
+            <option value="auto">Auto (question's language)</option>
+          </select>
+        </div>
+        <div id="chips" class="chips sug"></div>
+        <div id="thread" class="thread"></div>
+        <div class="ask-box">
+          <textarea id="question" rows="2" placeholder="Type a question… (Enter = send, Shift+Enter = new line)"></textarea>
+          <button id="askBtn" class="btn">Send ➤</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav id="dots" class="dots" aria-label="Slides"></nav>
+
+  <!-- ================= HISTORY ================= -->
+  <section id="view-history" class="history" hidden>
+    <div class="hist-wrap">
+      <div class="row-between">
+        <h2>My History</h2>
+        <button id="clearHist" class="btn small ghost">Delete all</button>
+      </div>
+      <p class="muted" id="histNote"></p>
+      <div id="histList"></div>
+    </div>
+  </section>
+
+  <!-- AUTH MODAL -->
+  <dialog id="authModal">
+    <form method="dialog" class="modal">
+      <h3 id="authTitle">Login</h3>
+      <button type="button" id="googleBtn" class="btn ghost">Continue with Google</button>
+      <div class="or">or</div>
+      <input id="email" type="email" placeholder="Email" autocomplete="email">
+      <input id="pass" type="password" placeholder="Password (min 6)" autocomplete="current-password">
+      <p id="authErr" class="error" hidden></p>
+      <button type="button" id="authSubmit" class="btn">Login</button>
+      <button type="button" id="authSwitch" class="link">New here? Register</button>
+      <button value="cancel" class="link muted">Close</button>
+    </form>
+  </dialog>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
